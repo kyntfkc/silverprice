@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { ProductInfo, SilverInfo, Expenses, Platform } from '../types'
 import { 
   calculateProductAmount, 
@@ -43,15 +43,16 @@ function InputForm({
   const [lengthOption, setLengthOption] = useState<'none' | '45' | '60'>('none')
 
   // Hesaplamalar: Ürün Tutarı = Ürün Gramı × İşçilik × Dolar Kuru
-  const productAmount = calculateProductAmount(
+  const productAmount = useMemo(() => calculateProductAmount(
     productInfo.productGram,
     productInfo.laborDollar,
     silverInfo.dollarRate
-  )
-  const purchasePrice = calculatePurchasePrice(productAmount)
+  ), [productInfo.productGram, productInfo.laborDollar, silverInfo.dollarRate])
+  
+  const purchasePrice = useMemo(() => calculatePurchasePrice(productAmount), [productAmount])
   
   // Dolar Tutarı (sadece gösterim için): Ürün Gramı × İşçilik
-  const dollarAmount = productInfo.productGram * productInfo.laborDollar
+  const dollarAmount = useMemo(() => productInfo.productGram * productInfo.laborDollar, [productInfo.productGram, productInfo.laborDollar])
 
   useEffect(() => {
     const updatedProductInfo = {
@@ -61,7 +62,7 @@ function InputForm({
     if (Math.abs(updatedProductInfo.dollarAmount - productInfo.dollarAmount) > 0.0001) {
       onProductInfoChange(updatedProductInfo)
     }
-  }, [productInfo.productGram, productInfo.laborDollar, productInfo.dollarAmount, dollarAmount])
+  }, [productInfo, dollarAmount, onProductInfoChange])
 
   useEffect(() => {
     const updatedSilverInfo = {
@@ -75,7 +76,7 @@ function InputForm({
     ) {
       onSilverInfoChange(updatedSilverInfo)
     }
-  }, [productAmount, purchasePrice, silverInfo.productAmount, silverInfo.purchasePrice])
+  }, [silverInfo, productAmount, purchasePrice, onSilverInfoChange])
 
   const toggleSection = (section: 'labor' | 'expenses' | 'extras') => {
     setExpandedSections((prev) => ({
@@ -84,31 +85,36 @@ function InputForm({
     }))
   }
 
-  const updateProductInfo = (field: keyof ProductInfo, value: number | boolean) => {
+  const updateProductInfo = useCallback((field: keyof ProductInfo, value: number | boolean) => {
     onProductInfoChange({ ...productInfo, [field]: value })
-  }
+  }, [productInfo, onProductInfoChange])
 
-  const updateSilverInfo = (field: keyof SilverInfo, value: number) => {
+  const updateSilverInfo = useCallback((field: keyof SilverInfo, value: number) => {
     onSilverInfoChange({ ...silverInfo, [field]: value })
-  }
+  }, [silverInfo, onSilverInfoChange])
 
-  const updateExpenses = (field: keyof Expenses, value: number) => {
+  const updateExpenses = useCallback((field: keyof Expenses, value: number) => {
     onExpensesChange({ ...expenses, [field]: value })
-  }
+  }, [expenses, onExpensesChange])
 
-  const handleSpecialPackagingToggle = () => {
+  const handleSpecialPackagingToggle = useCallback(() => {
     if (expenses.specialPackaging === 0) {
       try {
         const saved = localStorage.getItem('appSettings')
-        const val = saved ? JSON.parse(saved).defaultExtraCost : 150
-        updateExpenses('specialPackaging', typeof val === 'number' ? val : 150)
+        if (saved) {
+          const parsed = JSON.parse(saved)
+          const val = parsed?.defaultExtraCost ?? 150
+          updateExpenses('specialPackaging', typeof val === 'number' ? val : 150)
+        } else {
+          updateExpenses('specialPackaging', 150)
+        }
       } catch {
         updateExpenses('specialPackaging', 150)
       }
     } else {
       updateExpenses('specialPackaging', 0)
     }
-  }
+  }, [expenses.specialPackaging, expenses, updateExpenses])
 
   const updatePlatform = (index: number, field: keyof Platform, value: string | number) => {
     const updated = [...platforms]
@@ -155,7 +161,7 @@ function InputForm({
     const next = platforms.filter((_, i) => i !== index)
     if (next.length === 0) {
       onPlatformsChange([
-        { name: 'Standart', commissionRate: 22, salePrice: calculateDefaultSalePrice(silverInfo.productAmount), targetProfitRate: 15 },
+        { name: 'Standart', commissionRate: 22, salePrice: calculateDefaultSalePrice(silverInfo.productAmount), targetProfitRate: 20 },
       ])
     } else {
       onPlatformsChange(next)
@@ -194,7 +200,7 @@ function InputForm({
                     }
                   }}
                   onBlur={() => setProductGramInput('')}
-                  className="w-32 px-3 py-2.5 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 bg-white transition-all font-medium text-slate-900 hover:border-slate-400 shadow-sm"
+                  className="w-32 px-3 py-2.5 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500 bg-white transition-all font-medium text-slate-900 hover:border-slate-400 shadow-sm"
                   placeholder="0,00"
                 />
                 <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-medium">Gr</span>
@@ -202,48 +208,63 @@ function InputForm({
               <button
               type="button"
               onClick={() => {
-                const saved = localStorage.getItem('appSettings')
-                const chain45Price = saved ? JSON.parse(saved).defaultChain45Price ?? 10 : 10
-                const chain60Price = saved ? JSON.parse(saved).defaultChain60Price ?? 30 : 30
-                
-                const currentExtra = lengthOption === '45' ? chain45Price : lengthOption === '60' ? chain60Price : 0
-                const nextOption = lengthOption === '45' ? 'none' : '45'
-                const desiredExtra = nextOption === '45' ? chain45Price : 0
-                
-                // Ekstra maliyeti expenses'e ekle/çıkar
-                if (nextOption === '45') {
-                  updateExpenses('extraChain', chain45Price)
-                } else {
-                  updateExpenses('extraChain', 0)
+                try {
+                  const saved = localStorage.getItem('appSettings')
+                  const chain45Price = saved ? (JSON.parse(saved)?.defaultChain45Price ?? 10) : 10
+                  const chain60Price = saved ? (JSON.parse(saved)?.defaultChain60Price ?? 30) : 30
+                  
+                  const nextOption = lengthOption === '45' ? 'none' : '45'
+                  
+                  // Ekstra maliyeti expenses'e ekle/çıkar
+                  if (nextOption === '45') {
+                    updateExpenses('extraChain', chain45Price)
+                  } else {
+                    updateExpenses('extraChain', 0)
+                  }
+                  
+                  setLengthOption(nextOption)
+                } catch {
+                  const nextOption = lengthOption === '45' ? 'none' : '45'
+                  if (nextOption === '45') {
+                    updateExpenses('extraChain', 10)
+                  } else {
+                    updateExpenses('extraChain', 0)
+                  }
+                  setLengthOption(nextOption)
                 }
-                
-                setLengthOption(nextOption)
               }}
-              className={`px-2.5 py-1.5 text-xs rounded-lg border transition-colors ${lengthOption === '45' ? 'bg-teal-500 text-white border-teal-500' : 'bg-white text-slate-700 border-slate-300 hover:border-slate-400'}`}
+              className={`px-2.5 py-1.5 text-xs rounded-lg border transition-colors ${lengthOption === '45' ? 'bg-rose-500 text-white border-rose-500' : 'bg-white text-slate-700 border-slate-300 hover:border-slate-400'}`}
             >
               45 cm Zincir
             </button>
             <button
               type="button"
               onClick={() => {
-                const saved = localStorage.getItem('appSettings')
-                const chain45Price = saved ? JSON.parse(saved).defaultChain45Price ?? 10 : 10
-                const chain60Price = saved ? JSON.parse(saved).defaultChain60Price ?? 30 : 30
-                
-                const currentExtra = lengthOption === '45' ? chain45Price : lengthOption === '60' ? chain60Price : 0
-                const nextOption = lengthOption === '60' ? 'none' : '60'
-                const desiredExtra = nextOption === '60' ? chain60Price : 0
-                
-                // Ekstra maliyeti expenses'e ekle/çıkar
-                if (nextOption === '60') {
-                  updateExpenses('extraChain', chain60Price)
-                } else {
-                  updateExpenses('extraChain', 0)
+                try {
+                  const saved = localStorage.getItem('appSettings')
+                  const chain60Price = saved ? (JSON.parse(saved)?.defaultChain60Price ?? 30) : 30
+                  
+                  const nextOption = lengthOption === '60' ? 'none' : '60'
+                  
+                  // Ekstra maliyeti expenses'e ekle/çıkar
+                  if (nextOption === '60') {
+                    updateExpenses('extraChain', chain60Price)
+                  } else {
+                    updateExpenses('extraChain', 0)
+                  }
+                  
+                  setLengthOption(nextOption)
+                } catch {
+                  const nextOption = lengthOption === '60' ? 'none' : '60'
+                  if (nextOption === '60') {
+                    updateExpenses('extraChain', 30)
+                  } else {
+                    updateExpenses('extraChain', 0)
+                  }
+                  setLengthOption(nextOption)
                 }
-                
-                setLengthOption(nextOption)
               }}
-              className={`px-2.5 py-1.5 text-xs rounded-lg border transition-colors ${lengthOption === '60' ? 'bg-teal-500 text-white border-teal-500' : 'bg-white text-slate-700 border-slate-300 hover:border-slate-400'}`}
+              className={`px-2.5 py-1.5 text-xs rounded-lg border transition-colors ${lengthOption === '60' ? 'bg-rose-500 text-white border-rose-500' : 'bg-white text-slate-700 border-slate-300 hover:border-slate-400'}`}
             >
               60 cm Zincir
             </button>
@@ -257,7 +278,7 @@ function InputForm({
                 value={expenses.specialPackaging}
                 onChange={(e) => updateExpenses('specialPackaging', parseFloat(e.target.value) || 0)}
                 disabled={expenses.specialPackaging === 0}
-                className={`w-20 px-2 py-1 text-xs border border-slate-300/70 rounded-md focus:ring-1 focus:ring-teal-500 focus:border-teal-500 bg-white shadow-sm disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed ${expenses.specialPackaging === 0 ? 'pointer-events-none opacity-60' : ''}`}
+                className={`w-20 px-2 py-1 text-xs border border-slate-300/70 rounded-md focus:ring-1 focus:ring-rose-500 focus:border-rose-500 bg-white shadow-sm disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed ${expenses.specialPackaging === 0 ? 'pointer-events-none opacity-60' : ''}`}
                 placeholder="150"
               />
               <span className="text-[11px] text-gray-500">TL</span>
@@ -268,7 +289,7 @@ function InputForm({
                   onChange={handleSpecialPackagingToggle}
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-500"></div>
+                <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500"></div>
               </label>
             </div>
           </div>
@@ -309,7 +330,7 @@ function InputForm({
                       }
                     }}
                     onBlur={() => setLaborDollarInput('')}
-                    className="w-full px-2.5 py-2 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white shadow-sm"
+                    className="w-full px-2.5 py-2 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white shadow-sm"
                     placeholder="0,00"
                   />
                   <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-medium">$</span>
@@ -326,7 +347,7 @@ function InputForm({
                   step="0.01"
                   value={expenses.shipping}
                   onChange={(e) => updateExpenses('shipping', parseFloat(e.target.value) || 0)}
-                    className="h-9 w-full px-2 pr-8 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white text-center shadow-sm"
+                    className="h-9 w-full px-2 pr-8 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white text-center shadow-sm"
                 />
                   <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-500 font-medium">TL</span>
                 </div>
@@ -339,7 +360,7 @@ function InputForm({
                   step="0.01"
                   value={expenses.packaging}
                   onChange={(e) => updateExpenses('packaging', parseFloat(e.target.value) || 0)}
-                    className="h-9 w-full px-2 pr-8 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white text-center shadow-sm"
+                    className="h-9 w-full px-2 pr-8 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white text-center shadow-sm"
                 />
                   <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-500 font-medium">TL</span>
                 </div>
@@ -352,7 +373,7 @@ function InputForm({
                   step="0.01"
                   value={expenses.serviceFee}
                   onChange={(e) => updateExpenses('serviceFee', parseFloat(e.target.value) || 0)}
-                    className="h-9 w-full px-2 pr-8 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white text-center shadow-sm"
+                    className="h-9 w-full px-2 pr-8 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white text-center shadow-sm"
                 />
                   <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-500 font-medium">TL</span>
               </div>
@@ -367,7 +388,7 @@ function InputForm({
                     const value = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0
                     updateExpenses('eCommerceTaxRate', value)
                   }}
-                  className="h-9 w-full px-2 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white text-center shadow-sm"
+                  className="h-9 w-full px-2 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white text-center shadow-sm"
                   placeholder="1.00"
                 />
               </div>
@@ -382,7 +403,7 @@ function InputForm({
           <div className="flex items-center gap-2">
             <button
               onClick={addPlatform}
-              className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-teal-600 hover:text-teal-700 hover:bg-teal-50 rounded-lg transition-all"
+              className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-all"
               title="Yeni senaryo ekle"
             >
               <Plus className="w-3 h-3" />
@@ -390,7 +411,7 @@ function InputForm({
             </button>
             <button
               onClick={addLinedProduct}
-              className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-teal-600 hover:text-teal-700 hover:bg-teal-50 rounded-lg transition-all"
+              className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-all"
               title="Astarlı Ürün senaryosu ekle"
             >
               <Plus className="w-3 h-3" />
@@ -400,7 +421,7 @@ function InputForm({
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {platforms.map((platform, index) => (
-            <div key={index} className="p-3 bg-white rounded-lg border border-slate-300/70 shadow-sm hover:shadow-md hover:border-slate-400/60 transition-all duration-200 relative ring-1 ring-slate-200/20">
+            <div key={`${platform.name}-${index}`} className="p-3 bg-white rounded-lg border border-slate-300/70 shadow-sm hover:shadow-md hover:border-slate-400/60 transition-all duration-200 relative ring-1 ring-slate-200/20">
             <div className="space-y-1.5">
               <div className="relative">
                 <input
@@ -411,12 +432,12 @@ function InputForm({
                     updatePlatform(index, 'name', e.target.value)
                   }}
                   disabled={platform.name === 'Standart' || platform.name === 'Astarlı Ürün'}
-                  className="w-full px-2 py-1.5 pr-8 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white font-medium text-slate-900 text-center shadow-sm disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-500"
+                  className="w-full px-2 py-1.5 pr-8 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white font-medium text-slate-900 text-center shadow-sm disabled:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-500"
                   placeholder="Senaryo adı"
                 />
                 <button
                   onClick={() => removePlatform(index)}
-                  className="absolute top-1/2 right-1.5 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-teal-600 rounded-full transition-all duration-200 shadow-sm hover:shadow-md group z-10"
+                  className="absolute top-1/2 right-1.5 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-rose-600 rounded-full transition-all duration-200 shadow-sm hover:shadow-md group z-10"
                   title="Senaryoyu sil"
                 >
                   <X className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" strokeWidth={3} />
@@ -433,7 +454,7 @@ function InputForm({
                       onChange={(e) =>
                         updatePlatform(index, 'commissionRate', parseFloat(e.target.value) || 0)
                       }
-                      className="w-full px-2 py-1.5 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white text-center font-semibold shadow-sm"
+                      className="w-full px-2 py-1.5 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white text-center font-semibold shadow-sm"
                       placeholder="0"
                     />
                   </div>
@@ -442,13 +463,13 @@ function InputForm({
                     <input
                       type="number"
                       step="0.1"
-                      value={(platform.targetProfitRate ?? (platform.name === 'Astarlı Ürün' ? 30 : 15)) === 0 ? '' : (platform.targetProfitRate ?? (platform.name === 'Astarlı Ürün' ? 30 : 15))}
+                      value={(platform.targetProfitRate ?? (platform.name === 'Astarlı Ürün' ? 30 : 20)) === 0 ? '' : (platform.targetProfitRate ?? (platform.name === 'Astarlı Ürün' ? 30 : 20))}
                       onChange={(e) => {
                         const value = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0
                         updatePlatform(index, 'targetProfitRate', value)
                       }}
-                      className="w-full px-2 py-1.5 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white text-center font-semibold shadow-sm"
-                      placeholder={platform.name === 'Astarlı Ürün' ? '30' : '15'}
+                      className="w-full px-2 py-1.5 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white text-center font-semibold shadow-sm"
+                      placeholder={platform.name === 'Astarlı Ürün' ? '30' : '20'}
                     />
                   </div>
                 </div>
@@ -462,7 +483,7 @@ function InputForm({
                     onChange={(e) =>
                       updatePlatform(index, 'commissionRate', parseFloat(e.target.value) || 0)
                     }
-                    className="w-full px-2 py-1.5 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white text-center font-semibold shadow-sm"
+                    className="w-full px-2 py-1.5 text-sm border border-slate-300/70 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white text-center font-semibold shadow-sm"
                     placeholder="0"
                   />
                 </div>
@@ -484,7 +505,7 @@ function InputForm({
                         updatePlatform(index, 'salePrice', parseInt(e.target.value) || 0)
                       }}
                       disabled={platform.name === 'Standart' || platform.name === 'Astarlı Ürün'}
-                      className="w-full pr-8 px-2 py-1.5 text-sm border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white text-center font-semibold disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-500"
+                      className="w-full pr-8 px-2 py-1.5 text-sm border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white text-center font-semibold disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-500"
                       placeholder="0"
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-500 font-medium">TL</span>

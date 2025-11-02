@@ -13,7 +13,7 @@ function ResultsTableImpl({ results, showCommission = false, showBank = false }:
     <div className="overflow-x-auto -mx-2 sm:mx-0">
       <table className="w-full min-w-[720px] sm:min-w-0 table-fixed">
         <thead>
-            <tr className="border-b-2 border-slate-200/80 bg-gradient-to-r from-slate-50 via-teal-50/40 to-cyan-50/40">
+            <tr className="border-b-2 border-slate-200/80 bg-gradient-to-r from-slate-50 via-rose-50/40 to-pink-50/40">
             <th className="px-2 py-2 text-left text-[11px] sm:text-xs font-bold text-slate-700 uppercase tracking-wider">
               Senaryo
             </th>
@@ -47,19 +47,35 @@ function ResultsTableImpl({ results, showCommission = false, showBank = false }:
             const isCampaign = nameLc.includes('kampanya') || nameLc.includes('kampanyalı') || nameLc.includes('promosyon')
             const optimumScore = result.optimumScore ?? 0
             
-            let profitBgColor = 'bg-gradient-to-r from-teal-400 to-teal-500 shadow-md shadow-teal-300/30'
+            // Altın uygulaması renk şemasına göre optimum skor renklendirmesi
+            let profitBgColor = 'bg-gradient-to-r from-green-500 to-emerald-600 shadow-md shadow-green-300/30'
+            let scoreTextColor = 'text-green-700'
+            let scoreLabel = 'İyi'
+            
             if (isCampaign) {
               profitBgColor = 'bg-gradient-to-r from-slate-400 to-slate-600 shadow-md shadow-slate-300/30'
-            } else if (optimumScore >= 120) {
-              profitBgColor = 'bg-gradient-to-r from-teal-300 to-teal-400 shadow-md shadow-teal-300/30'
+              scoreTextColor = 'text-slate-600'
+              scoreLabel = 'Değişken'
             } else if (optimumScore >= 100) {
-              profitBgColor = 'bg-gradient-to-r from-emerald-400 to-green-500 shadow-md shadow-emerald-300/30'
+              profitBgColor = 'bg-gradient-to-r from-green-500 to-emerald-600 shadow-md shadow-green-300/30'
+              scoreTextColor = 'text-green-700'
+              scoreLabel = 'Mükemmel'
             } else if (optimumScore >= 80) {
-              profitBgColor = 'bg-gradient-to-r from-teal-400 to-teal-500 shadow-md shadow-teal-300/30'
+              profitBgColor = 'bg-gradient-to-r from-yellow-400 to-amber-500 shadow-md shadow-yellow-300/30'
+              scoreTextColor = 'text-yellow-700'
+              scoreLabel = 'İyi'
             } else if (optimumScore >= 60) {
-              profitBgColor = 'bg-gradient-to-r from-yellow-300 to-yellow-400 shadow-md shadow-yellow-200/40'
+              profitBgColor = 'bg-gradient-to-r from-orange-400 to-orange-500 shadow-md shadow-orange-300/30'
+              scoreTextColor = 'text-orange-700'
+              scoreLabel = 'Orta'
+            } else if (optimumScore >= 40) {
+              profitBgColor = 'bg-gradient-to-r from-red-400 to-red-500 shadow-md shadow-red-300/30'
+              scoreTextColor = 'text-red-700'
+              scoreLabel = 'Zayıf'
             } else {
-              profitBgColor = 'bg-gradient-to-r from-teal-500 to-teal-600 shadow-md shadow-teal-400/30'
+              profitBgColor = 'bg-gradient-to-r from-red-500 to-red-600 shadow-md shadow-red-400/30'
+              scoreTextColor = 'text-red-800'
+              scoreLabel = 'Çok Zayıf'
             }
 
             const commissionDisplay = result.commissionAmount === 0 
@@ -67,9 +83,9 @@ function ResultsTableImpl({ results, showCommission = false, showBank = false }:
               : `${formatNumber(result.commissionAmount)} TL`
 
             return (
-              <tr key={index} className="hover:bg-teal-50/50 transition-all duration-200 border-b border-slate-100/80 group">
+              <tr key={`${result.platform}-${index}`} className="hover:bg-rose-50/50 transition-all duration-200 border-b border-slate-100/80 group">
                 <td className="px-2 py-2 whitespace-nowrap">
-                  <span className="text-xs sm:text-sm font-semibold text-slate-900 group-hover:text-teal-600 transition-colors">
+                  <span className="text-xs sm:text-sm font-semibold text-slate-900 group-hover:text-rose-600 transition-colors">
                     {result.platform}
                   </span>
                 </td>
@@ -93,23 +109,11 @@ function ResultsTableImpl({ results, showCommission = false, showBank = false }:
                 <td className="px-2 py-2 whitespace-nowrap text-center">
                   {result.optimumScore !== undefined ? (
                     <div className="flex flex-col items-center gap-0.5">
-                      <span className={`text-sm sm:text-base font-bold ${
-                        isCampaign ? 'text-slate-600' :
-                        result.optimumScore >= 120 ? 'text-teal-500' :
-                        result.optimumScore >= 100 ? 'text-emerald-600' :
-                        result.optimumScore >= 80 ? 'text-teal-600' :
-                        result.optimumScore >= 60 ? 'text-yellow-600' :
-                        'text-slate-700'
-                      }`}>
+                      <span className={`text-sm sm:text-base font-bold ${scoreTextColor}`}>
                         {Math.round(result.optimumScore)}
                       </span>
                       <span className="text-[10px] text-slate-500 font-medium">
-                        {isCampaign ? 'Değişken' :
-                         result.optimumScore >= 120 ? 'Aşırı' :
-                         result.optimumScore >= 100 ? 'Mükemmel' :
-                         result.optimumScore >= 80 ? 'İyi' :
-                         result.optimumScore >= 60 ? 'Orta' :
-                         'Zayıf'}
+                        {scoreLabel}
                       </span>
                     </div>
                   ) : (
@@ -118,7 +122,7 @@ function ResultsTableImpl({ results, showCommission = false, showBank = false }:
                 </td>
                 {showBank && (
                   <td className="px-2 py-2 whitespace-nowrap text-center">
-                    <span className="text-xs sm:text-sm font-semibold text-teal-700">
+                    <span className="text-xs sm:text-sm font-semibold text-rose-700">
                       {formatNumber(result.bankayaYatan)} TL
                     </span>
                   </td>

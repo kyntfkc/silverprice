@@ -32,7 +32,7 @@ const defaultExpenses: Expenses = {
 }
 
 const getDefaultPlatforms = (productAmount: number = 138.60): Platform[] => [
-  { name: 'Standart', commissionRate: 22, salePrice: Math.round(productAmount * 2), targetProfitRate: 15 },
+  { name: 'Standart', commissionRate: 22, salePrice: Math.round(productAmount * 2), targetProfitRate: 20 },
 ]
 
 function ProfitCalculator() {
@@ -45,7 +45,7 @@ function ProfitCalculator() {
     defaultServiceFee: 12,
     defaultETaxRate: 1.0,
     defaultCommission: 22,
-    defaultStandardProfit: 15,
+    defaultStandardProfit: 20,
     defaultLinedProfit: 30,
     defaultExtraCost: 150,
     defaultChain45Price: 10,
@@ -100,21 +100,33 @@ function ProfitCalculator() {
     return defaultSilverInfo
   })
   const [expenses, setExpenses] = useState<Expenses>(() => {
-    const saved = localStorage.getItem('expenses')
-    return saved ? JSON.parse(saved) : defaultExpenses
+    try {
+      const saved = localStorage.getItem('expenses')
+      return saved ? JSON.parse(saved) : defaultExpenses
+    } catch {
+      return defaultExpenses
+    }
   })
   const [platforms, setPlatforms] = useState<Platform[]>(() => {
-    const saved = localStorage.getItem('platforms')
-    if (saved) {
-      const parsed = JSON.parse(saved)
-      if (parsed.length === 0 || !parsed.some((p: Platform) => p.name === 'Standart')) {
-        const savedSilverInfo = localStorage.getItem('silverInfo')
-        const productAmount = savedSilverInfo ? JSON.parse(savedSilverInfo).productAmount : defaultSilverInfo.productAmount
-        return getDefaultPlatforms(productAmount)
+    try {
+      const saved = localStorage.getItem('platforms')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (parsed.length === 0 || !parsed.some((p: Platform) => p.name === 'Standart')) {
+          try {
+            const savedSilverInfo = localStorage.getItem('silverInfo')
+            const productAmount = savedSilverInfo ? JSON.parse(savedSilverInfo).productAmount : defaultSilverInfo.productAmount
+            return getDefaultPlatforms(productAmount)
+          } catch {
+            return getDefaultPlatforms(defaultSilverInfo.productAmount)
+          }
+        }
+        return parsed
       }
-      return parsed
+      return getDefaultPlatforms(defaultSilverInfo.productAmount)
+    } catch {
+      return getDefaultPlatforms(defaultSilverInfo.productAmount)
     }
-    return getDefaultPlatforms(defaultSilverInfo.productAmount)
   })
   const [results, setResults] = useState<ProfitResult[]>([])
   const [isCalculating, setIsCalculating] = useState(false)
@@ -122,20 +134,49 @@ function ProfitCalculator() {
   const [toast, setToast] = useState<{message: string; type?: 'success' | 'error' | 'info'} | null>(null)
   const [showExtraCols, setShowExtraCols] = useState(false)
 
+  // localStorage'a debounce ile yazma (performans için)
   useEffect(() => {
-    localStorage.setItem('productInfo', JSON.stringify(productInfo))
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem('productInfo', JSON.stringify(productInfo))
+      } catch (e) {
+        console.error('localStorage write error:', e)
+      }
+    }, 300)
+    return () => clearTimeout(timer)
   }, [productInfo])
 
   useEffect(() => {
-    localStorage.setItem('silverInfo', JSON.stringify(silverInfo))
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem('silverInfo', JSON.stringify(silverInfo))
+      } catch (e) {
+        console.error('localStorage write error:', e)
+      }
+    }, 300)
+    return () => clearTimeout(timer)
   }, [silverInfo])
 
   useEffect(() => {
-    localStorage.setItem('expenses', JSON.stringify(expenses))
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem('expenses', JSON.stringify(expenses))
+      } catch (e) {
+        console.error('localStorage write error:', e)
+      }
+    }, 300)
+    return () => clearTimeout(timer)
   }, [expenses])
 
   useEffect(() => {
-    localStorage.setItem('platforms', JSON.stringify(platforms))
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem('platforms', JSON.stringify(platforms))
+      } catch (e) {
+        console.error('localStorage write error:', e)
+      }
+    }, 300)
+    return () => clearTimeout(timer)
   }, [platforms])
 
   // Backend sync kaldırıldı - sadece localStorage kullanılıyor
@@ -172,7 +213,13 @@ function ProfitCalculator() {
   }, [])
 
   // Standart ve Astarlı Ürün senaryolarının fiyatını otomatik hesapla
+  const prevDepsRef = useRef<string>('')
   useEffect(() => {
+    const depsKey = `${productInfo.productGram}-${productInfo.laborDollar}-${silverInfo.dollarRate}-${expenses.shipping}-${expenses.packaging}-${expenses.serviceFee}-${expenses.extraChain}-${expenses.specialPackaging}-${expenses.eCommerceTaxRate}`
+    
+    if (prevDepsRef.current === depsKey) return
+    prevDepsRef.current = depsKey
+    
     setPlatforms(prevPlatforms => {
       let updated: Platform[] | null = null
       const autoNames = ['Standart', 'Astarlı Ürün']
@@ -181,7 +228,7 @@ function ProfitCalculator() {
         if (idx !== -1) {
           const platform = prevPlatforms[idx]
           const commissionRate = platform.commissionRate || 22
-          const defaultTarget = name === 'Astarlı Ürün' ? 30 : 15
+          const defaultTarget = name === 'Astarlı Ürün' ? 30 : 20
           const targetProfitRate = platform.targetProfitRate ?? defaultTarget
           const newSalePrice = calculateStandardSalePrice(
             productInfo,
@@ -200,42 +247,42 @@ function ProfitCalculator() {
     })
   }, [productInfo, silverInfo, expenses])
   
-  // Kar oranı değiştiğinde otomatik fiyat güncelleme (sonsuz döngü önlemek için ref kullan)
+  // Kar oranı değiştiğinde otomatik fiyat güncelleme
   const prevProfitRatesRef = useRef<string>('')
   useEffect(() => {
     const currentProfitRates = platforms
       .filter(p => p.name === 'Standart' || p.name === 'Astarlı Ürün')
-      .map(p => `${p.name}:${p.targetProfitRate ?? (p.name === 'Astarlı Ürün' ? 30 : 15)}`)
+      .map(p => `${p.name}:${p.commissionRate}:${p.targetProfitRate ?? (p.name === 'Astarlı Ürün' ? 30 : 20)}`)
       .join('|')
     
-    if (prevProfitRatesRef.current !== currentProfitRates) {
-      prevProfitRatesRef.current = currentProfitRates
-      setPlatforms(prevPlatforms => {
-        let updated: Platform[] | null = null
-        const autoNames = ['Standart', 'Astarlı Ürün']
-        autoNames.forEach(name => {
-          const idx = prevPlatforms.findIndex(p => p.name === name)
-          if (idx !== -1) {
-            const platform = prevPlatforms[idx]
-            const commissionRate = platform.commissionRate || 22
-            const defaultTarget = name === 'Astarlı Ürün' ? 30 : 15
-            const targetProfitRate = platform.targetProfitRate ?? defaultTarget
-            const newSalePrice = calculateStandardSalePrice(
-              productInfo,
-              silverInfo,
-              expenses,
-              commissionRate,
-              targetProfitRate
-            )
-            if (Math.abs(platform.salePrice - newSalePrice) > 0.01) {
-              if (!updated) updated = [...prevPlatforms]
-              updated[idx] = { ...updated[idx], salePrice: newSalePrice }
-            }
+    if (prevProfitRatesRef.current === currentProfitRates) return
+    prevProfitRatesRef.current = currentProfitRates
+    
+    setPlatforms(prevPlatforms => {
+      let updated: Platform[] | null = null
+      const autoNames = ['Standart', 'Astarlı Ürün']
+      autoNames.forEach(name => {
+        const idx = prevPlatforms.findIndex(p => p.name === name)
+        if (idx !== -1) {
+          const platform = prevPlatforms[idx]
+          const commissionRate = platform.commissionRate || 22
+          const defaultTarget = name === 'Astarlı Ürün' ? 30 : 20
+          const targetProfitRate = platform.targetProfitRate ?? defaultTarget
+          const newSalePrice = calculateStandardSalePrice(
+            productInfo,
+            silverInfo,
+            expenses,
+            commissionRate,
+            targetProfitRate
+          )
+          if (Math.abs(platform.salePrice - newSalePrice) > 0.01) {
+            if (!updated) updated = [...prevPlatforms]
+            updated[idx] = { ...updated[idx], salePrice: newSalePrice }
           }
-        })
-        return updated ?? prevPlatforms
+        }
       })
-    }
+      return updated ?? prevPlatforms
+    })
   }, [platforms, productInfo, silverInfo, expenses])
 
   useEffect(() => {
@@ -283,7 +330,7 @@ function ProfitCalculator() {
         </div>
       </div>
 
-      <div className="order-2 md:order-1 card p-4 sm:p-6 hover:shadow-2xl hover:shadow-teal-300/10 transition-all duration-300">
+      <div className="order-2 md:order-1 card p-4 sm:p-6 hover:shadow-2xl hover:shadow-rose-300/10 transition-all duration-300">
         <InputForm
           productInfo={productInfo}
           silverInfo={silverInfo}
@@ -318,10 +365,10 @@ function ProfitCalculator() {
           <SilverRateCard silverInfo={silverInfo} onSilverInfoChange={setSilverInfo} />
         </div>
 
-        <div className="card p-4 sm:p-6 overflow-y-auto overflow-x-hidden hover:shadow-2xl hover:shadow-teal-300/10 transition-all duration-300">
+        <div className="card p-4 sm:p-6 overflow-y-auto overflow-x-hidden hover:shadow-2xl hover:shadow-rose-300/10 transition-all duration-300">
         {isCalculating ? (
           <div className="flex flex-col items-center justify-center h-full">
-            <Loader2 className="w-12 h-12 text-teal-500 animate-spin mb-4" />
+            <Loader2 className="w-12 h-12 text-rose-500 animate-spin mb-4" />
             <p className="text-sm text-slate-600 font-medium">Hesaplanıyor...</p>
           </div>
         ) : results.length > 0 ? (
@@ -343,8 +390,8 @@ function ProfitCalculator() {
         </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-slate-400">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 flex items-center justify-center mb-4">
-              <svg className="w-10 h-10 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-rose-100 to-pink-100 flex items-center justify-center mb-4">
+              <svg className="w-10 h-10 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
@@ -358,7 +405,7 @@ function ProfitCalculator() {
 
       <button
         onClick={()=>setShowSettings(true)}
-        className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-40 inline-flex items-center gap-2 px-3 sm:px-4 py-3 rounded-xl text-sm font-semibold text-white shadow-2xl shadow-teal-500/30 bg-gradient-to-r from-teal-500 via-teal-600 to-cyan-600 hover:from-teal-600 hover:via-teal-700 hover:to-cyan-700 ring-4 ring-teal-500/10 hover:scale-105 transition-all"
+        className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-40 inline-flex items-center gap-2 px-3 sm:px-4 py-3 rounded-xl text-sm font-semibold text-white shadow-2xl shadow-rose-500/30 bg-gradient-to-r from-rose-500 via-rose-600 to-pink-600 hover:from-rose-600 hover:via-rose-700 hover:to-pink-700 ring-4 ring-rose-500/10 hover:scale-105 transition-all"
         title="Ayarlar"
       >
         <Settings className="w-4 h-4 text-white" /> <span className="hidden sm:inline">Ayarlar</span>

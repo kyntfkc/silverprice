@@ -58,7 +58,7 @@ export function calculateProfit(
   const netProfit = platform.salePrice - totalCost
   
   // Kâr %: (Kazanç ÷ Satış Tutarı) × 100
-  const profitRate = (netProfit / platform.salePrice) * 100
+  const profitRate = platform.salePrice > 0 ? (netProfit / platform.salePrice) * 100 : 0
 
   // Bankaya yatan: Satış Tutarı - (Komisyon + Kargo + Stopaj)
   const bankayaYatan = platform.salePrice - (commissionAmount + expenses.shipping + eCommerceTaxAmount)
@@ -69,10 +69,10 @@ export function calculateProfit(
     silverInfo,
     expenses,
     platform.commissionRate,
-    15
+    20
   )
-  const salePriceCoefficient = standardSalePrice > 0 ? platform.salePrice / standardSalePrice : 1
-  const optimumScore = (profitRate / 15) * salePriceCoefficient * 100
+  const salePriceCoefficient = standardSalePrice > 0 && platform.salePrice > 0 ? platform.salePrice / standardSalePrice : 1
+  const optimumScore = standardSalePrice > 0 ? (profitRate / 20) * salePriceCoefficient * 100 : 0
 
   return {
     platform: platform.name,
@@ -123,7 +123,7 @@ export function calculateStandardSalePrice(
   silverInfo: SilverInfo,
   expenses: Expenses,
   commissionRate: number = 22,
-  targetProfitRate: number = 15
+  targetProfitRate: number = 20
 ): number {
   const productAmount = calculateProductAmount(
     productInfo.productGram,

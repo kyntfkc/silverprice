@@ -6,9 +6,9 @@
 :root {
   --bg: 248 250 252; /* slate-50 */
   --surface: 255 255 255;
-  --primary-start: 94 234 212; /* teal-400 */
-  --primary-end: 20 184 166;  /* teal-500 */
-  --ring: 153 246 228; /* teal-300 */
+  --primary-start: 251 113 133; /* rose-400 */
+  --primary-end: 244 63 94;  /* rose-500 */
+  --ring: 255 182 193; /* pink-300 */
 }
 
 html, body {
@@ -20,7 +20,7 @@ html, body {
     @apply bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl shadow-slate-900/5 border border-slate-200/80 ring-1 ring-slate-200/50;
   }
   .btn-primary {
-    @apply h-9 px-3 rounded-xl text-white text-xs font-semibold shadow hover:opacity-95 disabled:opacity-60 flex items-center justify-center bg-gradient-to-r from-teal-500 to-teal-600;
+    @apply h-9 px-3 rounded-xl text-white text-xs font-semibold shadow hover:opacity-95 disabled:opacity-60 flex items-center justify-center bg-gradient-to-r from-rose-500 to-rose-600;
   }
   .btn-outline {
     @apply h-9 px-3 rounded-xl border border-slate-300 text-slate-700 text-xs font-semibold hover:bg-slate-50 flex items-center justify-center;
