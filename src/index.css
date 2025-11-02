@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme variables */
+:root {
+  --bg: 248 250 252; /* slate-50 */
+  --surface: 255 255 255;
+  --primary-start: 94 234 212; /* teal-400 */
+  --primary-end: 20 184 166;  /* teal-500 */
+  --ring: 153 246 228; /* teal-300 */
+}
+
+html, body {
+  @apply bg-[rgb(var(--bg))];
+}
+
+@layer components {
+  .card {
+    @apply bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl shadow-slate-900/5 border border-slate-200/80 ring-1 ring-slate-200/50;
+  }
+  .btn-primary {
+    @apply h-9 px-3 rounded-xl text-white text-xs font-semibold shadow hover:opacity-95 disabled:opacity-60 flex items-center justify-center bg-gradient-to-r from-teal-500 to-teal-600;
+  }
+  .btn-outline {
+    @apply h-9 px-3 rounded-xl border border-slate-300 text-slate-700 text-xs font-semibold hover:bg-slate-50 flex items-center justify-center;
+  }
+  .section-title {
+    @apply text-sm font-extrabold text-slate-900 uppercase tracking-wide;
+  }
+}
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
