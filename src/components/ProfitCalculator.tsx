@@ -395,7 +395,7 @@ function ProfitCalculator() {
         </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-slate-500">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-slate-100 via-blue-50/50 to-indigo-50/30 flex items-center justify-center mb-4 shadow-inner ring-2 ring-slate-200/50">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-slate-100 via-blue-200/50 to-indigo-300/40 flex items-center justify-center mb-4 shadow-inner ring-2 ring-slate-200/50">
               <svg className="w-10 h-10 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
@@ -410,7 +410,7 @@ function ProfitCalculator() {
 
       <button
         onClick={()=>setShowSettings(true)}
-        className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-40 inline-flex items-center gap-2 px-3 sm:px-4 py-3 rounded-xl text-sm font-semibold text-white shadow-2xl shadow-slate-500/40 bg-gradient-to-r from-slate-500 via-slate-600 to-slate-700 hover:from-slate-600 hover:via-slate-700 hover:to-slate-800 ring-4 ring-slate-500/20 hover:scale-105 hover:shadow-slate-600/50 transition-all duration-200"
+        className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-40 inline-flex items-center gap-2 px-3 sm:px-4 py-3 rounded-xl text-sm font-semibold text-white shadow-2xl shadow-blue-600/40 bg-gradient-to-r from-slate-500 via-blue-600 via-indigo-600 to-slate-700 hover:from-blue-600 hover:via-indigo-700 hover:to-slate-800 ring-4 ring-blue-500/20 hover:scale-105 hover:shadow-blue-600/50 transition-all duration-200"
         title="Ayarlar"
       >
         <Settings className="w-4 h-4 text-white" /> <span className="hidden sm:inline">Ayarlar</span>

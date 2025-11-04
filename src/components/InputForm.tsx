@@ -291,7 +291,7 @@ function InputForm({
             </button>
             </div>
 
-            <div className="flex items-center gap-2 bg-gradient-to-r from-slate-50/80 to-blue-50/30 px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-sm">
+            <div className="flex items-center gap-2 bg-gradient-to-r from-slate-50/80 to-blue-200/40 px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-sm">
               <span className="text-xs font-medium text-slate-700">Işıklı Kutu</span>
               <input
                 type="number"
@@ -313,7 +313,7 @@ function InputForm({
                 <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-slate-500 peer-checked:to-slate-600"></div>
               </label>
             </div>
-            <div className="flex items-center gap-2 bg-gradient-to-r from-slate-50/80 to-blue-50/30 px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-sm">
+            <div className="flex items-center gap-2 bg-gradient-to-r from-slate-50/80 to-blue-200/40 px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-sm">
               <span className="text-xs font-medium text-slate-700">Premium Kutu</span>
               <input
                 type="number"
@@ -446,7 +446,7 @@ function InputForm({
           <div className="flex items-center gap-2">
             <button
               onClick={addPlatform}
-              className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-slate-600 hover:text-slate-700 hover:bg-gradient-to-r hover:from-slate-50 hover:to-blue-50/50 rounded-lg transition-all shadow-sm hover:shadow-md"
+              className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-slate-600 hover:text-slate-700 hover:bg-gradient-to-r hover:from-slate-50 hover:to-blue-200/50 rounded-lg transition-all shadow-sm hover:shadow-md"
               title="Yeni senaryo ekle"
             >
               <Plus className="w-3 h-3" />

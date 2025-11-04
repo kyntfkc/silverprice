@@ -20,7 +20,7 @@ html, body {
     @apply bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl shadow-slate-900/5 border border-slate-200/80 ring-1 ring-slate-200/50;
   }
   .btn-primary {
-    @apply h-9 px-3 rounded-xl text-white text-xs font-semibold shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-60 flex items-center justify-center bg-gradient-to-r from-slate-500 via-slate-600 to-slate-700 hover:from-slate-600 hover:via-slate-700 hover:to-slate-800 transition-all duration-200;
+    @apply h-9 px-3 rounded-xl text-white text-xs font-semibold shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-60 flex items-center justify-center bg-gradient-to-r from-slate-500 via-blue-600 via-indigo-600 to-slate-700 hover:from-blue-600 hover:via-indigo-700 hover:to-slate-800 transition-all duration-200;
   }
   .btn-outline {
     @apply h-9 px-3 rounded-xl border border-slate-300 text-slate-700 text-xs font-semibold hover:bg-slate-50 flex items-center justify-center;
