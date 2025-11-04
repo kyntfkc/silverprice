@@ -121,7 +121,7 @@ function InputForm({
     } else {
       updateExpenses('specialPackaging', 0)
     }
-  }, [expenses.specialPackaging, expenses, updateExpenses])
+  }, [expenses.specialPackaging, updateExpenses])
 
   const handlePremiumBoxToggle = useCallback(() => {
     if (expenses.premiumBox === 0) {
@@ -140,7 +140,7 @@ function InputForm({
     } else {
       updateExpenses('premiumBox', 0)
     }
-  }, [expenses.premiumBox, expenses, updateExpenses])
+  }, [expenses.premiumBox, updateExpenses])
 
   const updatePlatform = (index: number, field: keyof Platform, value: string | number) => {
     const updated = [...platforms]
