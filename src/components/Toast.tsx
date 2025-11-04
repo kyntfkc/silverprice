@@ -13,7 +13,7 @@ export default function Toast({ message, type = 'info', onClose, duration = 2500
     return () => clearTimeout(t)
   }, [duration, onClose])
 
-  const color = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-rose-600' : 'bg-slate-800'
+  const color = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-zinc-600' : 'bg-slate-800'
 
   return (
     <div className={`fixed left-1/2 -translate-x-1/2 bottom-6 z-[100] text-white px-4 py-2 rounded-lg shadow-xl ${color} animate-[fadeIn_150ms_ease-out]`}>
