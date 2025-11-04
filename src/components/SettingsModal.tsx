@@ -111,7 +111,7 @@ export default function SettingsModal({ open, initial, onClose, onSave }: Settin
               className="w-full px-2 py-1.5 text-sm border border-slate-300 rounded-lg" />
           </div>
           <div>
-            <label className="block text-xs text-slate-600 mb-1 font-medium">Ekstra Maliyet Farkı (varsayılan)</label>
+            <label className="block text-xs text-slate-600 mb-1 font-medium">Işıklı Kutu (varsayılan)</label>
             <input type="text" inputMode="numeric" value={draft.defaultExtraCost}
               onChange={e=>setDraftValue('defaultExtraCost', e.target.value)} onBlur={()=>commitNumber('defaultExtraCost')}
               className="w-full px-2 py-1.5 text-sm border border-slate-300 rounded-lg" />
