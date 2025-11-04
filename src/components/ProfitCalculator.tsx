@@ -11,8 +11,8 @@ import SettingsModal, { AppSettings } from './SettingsModal'
 
 const defaultProductInfo: ProductInfo = {
   productGram: 2.20,
-  laborDollar: 1.50,
-  dollarAmount: 3.30, // Ürün Gramı × İşçilik = 2.20 × 1.50
+  laborDollar: 3.00,
+  dollarAmount: 6.60, // Ürün Gramı × İşçilik = 2.20 × 3.00
 }
 
 const defaultSilverInfo: SilverInfo = {
@@ -29,24 +29,24 @@ const defaultExpenses: Expenses = {
   serviceFee: 12,
   extraChain: 5,
   specialPackaging: 0,
+  silverChain45Cost: 84, // Dolar kuru x 2 = 42 x 2
 }
 
 const getDefaultPlatforms = (productAmount: number = 138.60): Platform[] => [
-  { name: 'Standart', commissionRate: 22, salePrice: Math.round(productAmount * 2), targetProfitRate: 20 },
+  { name: 'Standart', commissionRate: 22, salePrice: Math.round(productAmount * 2), targetProfitRate: 30 },
 ]
 
 function ProfitCalculator() {
   const defaultAppSettings: AppSettings = {
     defaultProductGram: 2.20,
     defaultDollarRate: 42.00,
-    defaultLaborDollar: 1.50,
+    defaultLaborDollar: 3.00,
     defaultShipping: 120,
     defaultPackaging: 20,
     defaultServiceFee: 12,
     defaultETaxRate: 1.0,
     defaultCommission: 22,
-    defaultStandardProfit: 20,
-    defaultLinedProfit: 30,
+    defaultStandardProfit: 30,
     defaultExtraCost: 150,
     defaultChain45Price: 10,
     defaultChain60Price: 30,
@@ -187,7 +187,6 @@ function ProfitCalculator() {
     setExpenses(prev => ({ ...prev, shipping: s.defaultShipping, packaging: s.defaultPackaging, serviceFee: s.defaultServiceFee, eCommerceTaxRate: s.defaultETaxRate, specialPackaging: prev.specialPackaging > 0 ? s.defaultExtraCost : 0 }))
     setPlatforms(prev => prev.map(p => {
       if (p.name === 'Standart') return { ...p, commissionRate: s.defaultCommission, targetProfitRate: s.defaultStandardProfit }
-      if (p.name === 'Astarlı Ürün') return { ...p, commissionRate: s.defaultCommission, targetProfitRate: s.defaultLinedProfit }
       return p
     }))
   }
@@ -212,23 +211,23 @@ function ProfitCalculator() {
     }
   }, [])
 
-  // Standart ve Astarlı Ürün senaryolarının fiyatını otomatik hesapla
+  // Standart senaryonun fiyatını otomatik hesapla
   const prevDepsRef = useRef<string>('')
   useEffect(() => {
-    const depsKey = `${productInfo.productGram}-${productInfo.laborDollar}-${silverInfo.dollarRate}-${expenses.shipping}-${expenses.packaging}-${expenses.serviceFee}-${expenses.extraChain}-${expenses.specialPackaging}-${expenses.eCommerceTaxRate}`
+    const depsKey = `${productInfo.productGram}-${productInfo.laborDollar}-${silverInfo.dollarRate}-${expenses.shipping}-${expenses.packaging}-${expenses.serviceFee}-${expenses.extraChain}-${expenses.specialPackaging}-${expenses.eCommerceTaxRate}-${expenses.silverChain45Cost}`
     
     if (prevDepsRef.current === depsKey) return
     prevDepsRef.current = depsKey
     
     setPlatforms(prevPlatforms => {
       let updated: Platform[] | null = null
-      const autoNames = ['Standart', 'Astarlı Ürün']
+      const autoNames = ['Standart']
       autoNames.forEach(name => {
         const idx = prevPlatforms.findIndex(p => p.name === name)
         if (idx !== -1) {
           const platform = prevPlatforms[idx]
           const commissionRate = platform.commissionRate || 22
-          const defaultTarget = name === 'Astarlı Ürün' ? 30 : 20
+          const defaultTarget = 30
           const targetProfitRate = platform.targetProfitRate ?? defaultTarget
           const newSalePrice = calculateStandardSalePrice(
             productInfo,
@@ -251,8 +250,8 @@ function ProfitCalculator() {
   const prevProfitRatesRef = useRef<string>('')
   useEffect(() => {
     const currentProfitRates = platforms
-      .filter(p => p.name === 'Standart' || p.name === 'Astarlı Ürün')
-      .map(p => `${p.name}:${p.commissionRate}:${p.targetProfitRate ?? (p.name === 'Astarlı Ürün' ? 30 : 20)}`)
+      .filter(p => p.name === 'Standart')
+      .map(p => `${p.name}:${p.commissionRate}:${p.targetProfitRate ?? 30}`)
       .join('|')
     
     if (prevProfitRatesRef.current === currentProfitRates) return
@@ -260,13 +259,13 @@ function ProfitCalculator() {
     
     setPlatforms(prevPlatforms => {
       let updated: Platform[] | null = null
-      const autoNames = ['Standart', 'Astarlı Ürün']
+      const autoNames = ['Standart']
       autoNames.forEach(name => {
         const idx = prevPlatforms.findIndex(p => p.name === name)
         if (idx !== -1) {
           const platform = prevPlatforms[idx]
           const commissionRate = platform.commissionRate || 22
-          const defaultTarget = name === 'Astarlı Ürün' ? 30 : 20
+          const defaultTarget = 30
           const targetProfitRate = platform.targetProfitRate ?? defaultTarget
           const newSalePrice = calculateStandardSalePrice(
             productInfo,

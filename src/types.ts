@@ -18,6 +18,7 @@ export interface Expenses {
   serviceFee: number
   extraChain: number
   specialPackaging: number
+  silverChain45Cost: number // 45 cm Gümüş Zincir (dolar kuru x 2)
 }
 
 export interface Platform {

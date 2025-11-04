@@ -10,7 +10,6 @@ export interface AppSettings {
   defaultETaxRate: number
   defaultCommission: number
   defaultStandardProfit: number
-  defaultLinedProfit: number
   defaultExtraCost: number
   defaultChain45Price: number
   defaultChain60Price: number
@@ -36,7 +35,6 @@ export default function SettingsModal({ open, initial, onClose, onSave }: Settin
     defaultETaxRate: String(initial.defaultETaxRate),
     defaultCommission: String(initial.defaultCommission),
     defaultStandardProfit: String(initial.defaultStandardProfit),
-    defaultLinedProfit: String(initial.defaultLinedProfit),
     defaultExtraCost: String(initial.defaultExtraCost),
     defaultChain45Price: String(initial.defaultChain45Price ?? 10),
     defaultChain60Price: String(initial.defaultChain60Price ?? 30),
@@ -54,7 +52,6 @@ export default function SettingsModal({ open, initial, onClose, onSave }: Settin
       defaultETaxRate: String(initial.defaultETaxRate),
       defaultCommission: String(initial.defaultCommission),
       defaultStandardProfit: String(initial.defaultStandardProfit),
-      defaultLinedProfit: String(initial.defaultLinedProfit),
       defaultExtraCost: String(initial.defaultExtraCost),
       defaultChain45Price: String(initial.defaultChain45Price ?? 10),
       defaultChain60Price: String(initial.defaultChain60Price ?? 30),
@@ -139,12 +136,6 @@ export default function SettingsModal({ open, initial, onClose, onSave }: Settin
             <label className="block text-xs text-slate-600 mb-1 font-medium">Standart Kâr Oranı (%)</label>
             <input type="text" inputMode="decimal" value={draft.defaultStandardProfit}
               onChange={e=>setDraftValue('defaultStandardProfit', e.target.value)} onBlur={()=>commitNumber('defaultStandardProfit')}
-              className="w-full px-2 py-1.5 text-sm border border-slate-300 rounded-lg" />
-          </div>
-          <div>
-            <label className="block text-xs text-slate-600 mb-1 font-medium">Astarlı Ürün Kâr Oranı (%)</label>
-            <input type="text" inputMode="decimal" value={draft.defaultLinedProfit}
-              onChange={e=>setDraftValue('defaultLinedProfit', e.target.value)} onBlur={()=>commitNumber('defaultLinedProfit')}
               className="w-full px-2 py-1.5 text-sm border border-slate-300 rounded-lg" />
           </div>
           <div>

@@ -42,14 +42,15 @@ export function calculateProfit(
   const eCommerceTaxRate = expenses.eCommerceTaxRate || 1.00
   const eCommerceTaxAmount = platform.salePrice * (eCommerceTaxRate / 100)
   
-  // Masraf Toplamı: Kargo + Ambalaj + Stopaj + Hizmet + Ekstra Zincir + Özel Ambalaj
+  // Masraf Toplamı: Kargo + Ambalaj + Stopaj + Hizmet + Ekstra Zincir + Işıklı Kutu (x2) + 45 cm Gümüş Zincir
   const totalExpenses = 
     expenses.shipping +
     expenses.packaging +
     eCommerceTaxAmount +
     expenses.serviceFee +
     expenses.extraChain +
-    expenses.specialPackaging
+    (expenses.specialPackaging * 2) + // Işıklı Kutu x2
+    expenses.silverChain45Cost
   
   // Toplam Maliyet: Alış Fiyatı + Masraf Toplamı + Komisyon Tutarı
   const totalCost = purchasePrice + totalExpenses + commissionAmount
@@ -69,10 +70,10 @@ export function calculateProfit(
     silverInfo,
     expenses,
     platform.commissionRate,
-    20
+    30
   )
-  const salePriceCoefficient = standardSalePrice > 0 && platform.salePrice > 0 ? platform.salePrice / standardSalePrice : 1
-  const optimumScore = standardSalePrice > 0 ? (profitRate / 20) * salePriceCoefficient * 100 : 0
+  const salePriceCoefficient = (standardSalePrice > 0 && platform.salePrice > 0) ? platform.salePrice / standardSalePrice : 1
+  const optimumScore = standardSalePrice > 0 ? (profitRate / 30) * salePriceCoefficient * 100 : 0
 
   return {
     platform: platform.name,
@@ -123,7 +124,7 @@ export function calculateStandardSalePrice(
   silverInfo: SilverInfo,
   expenses: Expenses,
   commissionRate: number = 22,
-  targetProfitRate: number = 20
+  targetProfitRate: number = 30
 ): number {
   const productAmount = calculateProductAmount(
     productInfo.productGram,
@@ -137,7 +138,8 @@ export function calculateStandardSalePrice(
     expenses.packaging +
     expenses.serviceFee +
     expenses.extraChain +
-    expenses.specialPackaging
+    (expenses.specialPackaging * 2) + // Işıklı Kutu x2
+    expenses.silverChain45Cost
   
   const eCommerceTaxRate = expenses.eCommerceTaxRate || 1.00
   const denominator = 1 - (eCommerceTaxRate / 100) - (commissionRate / 100) - (targetProfitRate / 100)
