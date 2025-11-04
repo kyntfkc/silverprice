@@ -50,6 +50,7 @@ function ProfitCalculator() {
     defaultExtraCost: 150,
     defaultChain45Price: 10,
     defaultChain60Price: 30,
+    lightBoxMultiplier: 2, // Işıklı Kutu varsayılan çarpanı
   }
 
   const [showSettings, setShowSettings] = useState(false)
@@ -234,7 +235,8 @@ function ProfitCalculator() {
             silverInfo,
             expenses,
             commissionRate,
-            targetProfitRate
+            targetProfitRate,
+            appSettings.lightBoxMultiplier
           )
           if (Math.abs(platform.salePrice - newSalePrice) > 0.01) {
             if (!updated) updated = [...prevPlatforms]
@@ -272,7 +274,8 @@ function ProfitCalculator() {
             silverInfo,
             expenses,
             commissionRate,
-            targetProfitRate
+            targetProfitRate,
+            appSettings.lightBoxMultiplier
           )
           if (Math.abs(platform.salePrice - newSalePrice) > 0.01) {
             if (!updated) updated = [...prevPlatforms]
@@ -292,7 +295,8 @@ function ProfitCalculator() {
         productInfo,
         silverInfo,
         expenses,
-        platforms
+        platforms,
+        appSettings.lightBoxMultiplier
       )
       setResults(calculatedResults)
       setIsCalculating(false)

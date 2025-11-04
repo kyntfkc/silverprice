@@ -20,7 +20,8 @@ export function calculateProfit(
   productInfo: ProductInfo,
   silverInfo: SilverInfo,
   expenses: Expenses,
-  platform: Platform
+  platform: Platform,
+  lightBoxMultiplier: number = 2
 ): ProfitResult {
   // Ürün Tutarı hesapla: Ürün Gramı × İşçilik × Dolar Kuru
   const productAmount = calculateProductAmount(
@@ -49,7 +50,7 @@ export function calculateProfit(
     eCommerceTaxAmount +
     expenses.serviceFee +
     expenses.extraChain +
-    (expenses.specialPackaging * 2) + // Işıklı Kutu x2
+    (expenses.specialPackaging * lightBoxMultiplier) + // Işıklı Kutu
     expenses.silverChain45Cost
   
   // Toplam Maliyet: Alış Fiyatı + Masraf Toplamı + Komisyon Tutarı
@@ -70,7 +71,8 @@ export function calculateProfit(
     silverInfo,
     expenses,
     platform.commissionRate,
-    30
+    30,
+    lightBoxMultiplier
   )
   const salePriceCoefficient = (standardSalePrice > 0 && platform.salePrice > 0) ? platform.salePrice / standardSalePrice : 1
   const optimumScore = standardSalePrice > 0 ? (profitRate / 30) * salePriceCoefficient * 100 : 0
@@ -93,7 +95,8 @@ export function calculateAllPlatforms(
   productInfo: ProductInfo,
   silverInfo: SilverInfo,
   expenses: Expenses,
-  platforms: Platform[]
+  platforms: Platform[],
+  lightBoxMultiplier: number = 2
 ): ProfitResult[] {
   const sortedPlatforms = [...platforms].sort((a, b) => {
     if (a.name === 'Standart') return -1
@@ -115,7 +118,7 @@ export function calculateAllPlatforms(
   })
   
   return sortedPlatforms.map(platform => 
-    calculateProfit(productInfo, silverInfo, expenses, platform)
+    calculateProfit(productInfo, silverInfo, expenses, platform, lightBoxMultiplier)
   )
 }
 
@@ -125,7 +128,8 @@ export function calculateStandardSalePrice(
   silverInfo: SilverInfo,
   expenses: Expenses,
   commissionRate: number = 22,
-  targetProfitRate: number = 30
+  targetProfitRate: number = 30,
+  lightBoxMultiplier: number = 2
 ): number {
   const productAmount = calculateProductAmount(
     productInfo.productGram,
@@ -139,7 +143,7 @@ export function calculateStandardSalePrice(
     expenses.packaging +
     expenses.serviceFee +
     expenses.extraChain +
-    (expenses.specialPackaging * 2) + // Işıklı Kutu x2
+    (expenses.specialPackaging * lightBoxMultiplier) + // Işıklı Kutu
     expenses.silverChain45Cost
   
   const eCommerceTaxRate = expenses.eCommerceTaxRate || 1.00

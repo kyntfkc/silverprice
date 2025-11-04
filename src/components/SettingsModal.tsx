@@ -13,6 +13,7 @@ export interface AppSettings {
   defaultExtraCost: number
   defaultChain45Price: number
   defaultChain60Price: number
+  lightBoxMultiplier: number // Işıklı Kutu çarpanı
 }
 
 interface SettingsModalProps {
@@ -38,6 +39,7 @@ export default function SettingsModal({ open, initial, onClose, onSave }: Settin
     defaultExtraCost: String(initial.defaultExtraCost),
     defaultChain45Price: String(initial.defaultChain45Price ?? 10),
     defaultChain60Price: String(initial.defaultChain60Price ?? 30),
+    lightBoxMultiplier: String(initial.lightBoxMultiplier ?? 2),
   })
 
   useEffect(() => {
@@ -55,6 +57,7 @@ export default function SettingsModal({ open, initial, onClose, onSave }: Settin
       defaultExtraCost: String(initial.defaultExtraCost),
       defaultChain45Price: String(initial.defaultChain45Price ?? 10),
       defaultChain60Price: String(initial.defaultChain60Price ?? 30),
+      lightBoxMultiplier: String(initial.lightBoxMultiplier ?? 2),
     })
   }, [initial])
 
@@ -148,6 +151,12 @@ export default function SettingsModal({ open, initial, onClose, onSave }: Settin
             <label className="block text-xs text-slate-600 mb-1 font-medium">60 cm Zincir Fiyatı (TL)</label>
             <input type="text" inputMode="numeric" value={draft.defaultChain60Price}
               onChange={e=>setDraftValue('defaultChain60Price', e.target.value)} onBlur={()=>commitNumber('defaultChain60Price')}
+              className="w-full px-2 py-1.5 text-sm border border-slate-300 rounded-lg" />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-600 mb-1 font-medium">Işıklı Kutu Çarpanı (x)</label>
+            <input type="text" inputMode="numeric" value={draft.lightBoxMultiplier}
+              onChange={e=>setDraftValue('lightBoxMultiplier', e.target.value)} onBlur={()=>commitNumber('lightBoxMultiplier')}
               className="w-full px-2 py-1.5 text-sm border border-slate-300 rounded-lg" />
           </div>
         </div>

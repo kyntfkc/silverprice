@@ -40,6 +40,7 @@ function InputForm({
   const [productGramInput, setProductGramInput] = useState<string>('')
   const [laborDollarInput, setLaborDollarInput] = useState<string>('')
   const [lengthOption, setLengthOption] = useState<'none' | '45' | '60'>('none')
+  const [silverChain45Enabled, setSilverChain45Enabled] = useState(false)
 
   // Hesaplamalar: Ürün Tutarı = Ürün Gramı × İşçilik × Dolar Kuru
   const productAmount = useMemo(() => calculateProductAmount(
@@ -56,11 +57,11 @@ function InputForm({
   // 45 cm Gümüş Zincir fiyatı: dolar kuru x 2
   const silverChain45Price = useMemo(() => silverInfo.dollarRate * 2, [silverInfo.dollarRate])
 
-  // 45 cm Gümüş Zincir fiyatını expenses'e güncelle
+  // 45 cm Gümüş Zincir fiyatını expenses'e güncelle (sadece seçiliyse)
   useEffect(() => {
-    updateExpenses('silverChain45Cost', silverChain45Price)
+    updateExpenses('silverChain45Cost', silverChain45Enabled ? silverChain45Price : 0)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [silverChain45Price])
+  }, [silverChain45Price, silverChain45Enabled])
 
   useEffect(() => {
     const updatedProductInfo = {
@@ -261,8 +262,10 @@ function InputForm({
             </button>
             <button
               type="button"
-              disabled
-              className={`px-2.5 py-1.5 text-xs rounded-lg border transition-colors bg-rose-500 text-white border-rose-500 cursor-default`}
+              onClick={() => {
+                setSilverChain45Enabled(!silverChain45Enabled)
+              }}
+              className={`px-2.5 py-1.5 text-xs rounded-lg border transition-colors ${silverChain45Enabled ? 'bg-rose-500 text-white border-rose-500' : 'bg-white text-slate-700 border-slate-300 hover:border-slate-400'}`}
               title={`45 cm Gümüş Zincir: ${Math.round(silverInfo.dollarRate * 2 * 100) / 100} TL`}
             >
               45 cm Gümüş Zincir
