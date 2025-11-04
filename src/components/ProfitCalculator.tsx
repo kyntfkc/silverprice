@@ -29,6 +29,7 @@ const defaultExpenses: Expenses = {
   serviceFee: 12,
   extraChain: 5,
   specialPackaging: 0,
+  premiumBox: 0,
   silverChain45Cost: 84, // Dolar kuru x 2 = 42 x 2
 }
 
@@ -48,6 +49,7 @@ function ProfitCalculator() {
     defaultCommission: 22,
     defaultStandardProfit: 30,
     defaultExtraCost: 150,
+    defaultPremiumBox: 300,
     defaultChain45Price: 10,
     defaultChain60Price: 30,
     lightBoxMultiplier: 2, // Işıklı Kutu varsayılan çarpanı
@@ -185,7 +187,7 @@ function ProfitCalculator() {
   const applySettingsToState = (s: AppSettings) => {
     setProductInfo(prev => ({ ...prev, productGram: s.defaultProductGram, laborDollar: s.defaultLaborDollar }))
     setSilverInfo(prev => ({ ...prev, dollarRate: s.defaultDollarRate }))
-    setExpenses(prev => ({ ...prev, shipping: s.defaultShipping, packaging: s.defaultPackaging, serviceFee: s.defaultServiceFee, eCommerceTaxRate: s.defaultETaxRate, specialPackaging: prev.specialPackaging > 0 ? s.defaultExtraCost : 0 }))
+    setExpenses(prev => ({ ...prev, shipping: s.defaultShipping, packaging: s.defaultPackaging, serviceFee: s.defaultServiceFee, eCommerceTaxRate: s.defaultETaxRate, specialPackaging: prev.specialPackaging > 0 ? s.defaultExtraCost : 0, premiumBox: prev.premiumBox > 0 ? s.defaultPremiumBox : 0 }))
     setPlatforms(prev => prev.map(p => {
       if (p.name === 'Standart') return { ...p, commissionRate: s.defaultCommission, targetProfitRate: s.defaultStandardProfit }
       return p

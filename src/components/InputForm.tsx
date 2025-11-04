@@ -123,6 +123,25 @@ function InputForm({
     }
   }, [expenses.specialPackaging, expenses, updateExpenses])
 
+  const handlePremiumBoxToggle = useCallback(() => {
+    if (expenses.premiumBox === 0) {
+      try {
+        const saved = localStorage.getItem('appSettings')
+        if (saved) {
+          const parsed = JSON.parse(saved)
+          const val = parsed?.defaultPremiumBox ?? 300
+          updateExpenses('premiumBox', typeof val === 'number' ? val : 300)
+        } else {
+          updateExpenses('premiumBox', 300)
+        }
+      } catch {
+        updateExpenses('premiumBox', 300)
+      }
+    } else {
+      updateExpenses('premiumBox', 0)
+    }
+  }, [expenses.premiumBox, expenses, updateExpenses])
+
   const updatePlatform = (index: number, field: keyof Platform, value: string | number) => {
     const updated = [...platforms]
     updated[index] = { ...updated[index], [field]: value }
@@ -289,6 +308,28 @@ function InputForm({
                   type="checkbox"
                   checked={expenses.specialPackaging > 0}
                   onChange={handleSpecialPackagingToggle}
+                  className="sr-only peer"
+                />
+                <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500"></div>
+              </label>
+            </div>
+            <div className="flex items-center gap-2 bg-slate-50/80 px-2.5 py-1.5 rounded-lg border border-slate-200">
+              <span className="text-xs font-medium text-slate-700">Premium Kutu</span>
+              <input
+                type="number"
+                step="0.01"
+                value={expenses.premiumBox}
+                onChange={(e) => updateExpenses('premiumBox', parseFloat(e.target.value) || 0)}
+                disabled={expenses.premiumBox === 0}
+                className={`w-20 px-2 py-1 text-xs border border-slate-300/70 rounded-md focus:ring-1 focus:ring-rose-500 focus:border-rose-500 bg-white shadow-sm disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed ${expenses.premiumBox === 0 ? 'pointer-events-none opacity-60' : ''}`}
+                placeholder="300"
+              />
+              <span className="text-[11px] text-gray-500">TL</span>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={expenses.premiumBox > 0}
+                  onChange={handlePremiumBoxToggle}
                   className="sr-only peer"
                 />
                 <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500"></div>

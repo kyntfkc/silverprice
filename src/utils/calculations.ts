@@ -43,7 +43,7 @@ export function calculateProfit(
   const eCommerceTaxRate = expenses.eCommerceTaxRate || 1.00
   const eCommerceTaxAmount = platform.salePrice * (eCommerceTaxRate / 100)
   
-  // Masraf Toplamı: Kargo + Ambalaj + Stopaj + Hizmet + Ekstra Zincir + Işıklı Kutu (x2) + 45 cm Gümüş Zincir
+  // Masraf Toplamı: Kargo + Ambalaj + Stopaj + Hizmet + Ekstra Zincir + Işıklı Kutu (x multiplier) + Premium Kutu + 45 cm Gümüş Zincir
   const totalExpenses = 
     expenses.shipping +
     expenses.packaging +
@@ -51,6 +51,7 @@ export function calculateProfit(
     expenses.serviceFee +
     expenses.extraChain +
     (expenses.specialPackaging * lightBoxMultiplier) + // Işıklı Kutu
+    expenses.premiumBox + // Premium Kutu
     expenses.silverChain45Cost
   
   // Toplam Maliyet: Alış Fiyatı + Masraf Toplamı + Komisyon Tutarı
@@ -144,6 +145,7 @@ export function calculateStandardSalePrice(
     expenses.serviceFee +
     expenses.extraChain +
     (expenses.specialPackaging * lightBoxMultiplier) + // Işıklı Kutu
+    expenses.premiumBox + // Premium Kutu
     expenses.silverChain45Cost
   
   const eCommerceTaxRate = expenses.eCommerceTaxRate || 1.00

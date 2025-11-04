@@ -11,6 +11,7 @@ export interface AppSettings {
   defaultCommission: number
   defaultStandardProfit: number
   defaultExtraCost: number
+  defaultPremiumBox: number
   defaultChain45Price: number
   defaultChain60Price: number
   lightBoxMultiplier: number // Işıklı Kutu çarpanı
@@ -37,6 +38,7 @@ export default function SettingsModal({ open, initial, onClose, onSave }: Settin
     defaultCommission: String(initial.defaultCommission),
     defaultStandardProfit: String(initial.defaultStandardProfit),
     defaultExtraCost: String(initial.defaultExtraCost),
+    defaultPremiumBox: String(initial.defaultPremiumBox ?? 300),
     defaultChain45Price: String(initial.defaultChain45Price ?? 10),
     defaultChain60Price: String(initial.defaultChain60Price ?? 30),
     lightBoxMultiplier: String(initial.lightBoxMultiplier ?? 2),
@@ -114,6 +116,12 @@ export default function SettingsModal({ open, initial, onClose, onSave }: Settin
             <label className="block text-xs text-slate-600 mb-1 font-medium">Işıklı Kutu (varsayılan)</label>
             <input type="text" inputMode="numeric" value={draft.defaultExtraCost}
               onChange={e=>setDraftValue('defaultExtraCost', e.target.value)} onBlur={()=>commitNumber('defaultExtraCost')}
+              className="w-full px-2 py-1.5 text-sm border border-slate-300 rounded-lg" />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-600 mb-1 font-medium">Premium Kutu (varsayılan)</label>
+            <input type="text" inputMode="numeric" value={draft.defaultPremiumBox}
+              onChange={e=>setDraftValue('defaultPremiumBox', e.target.value)} onBlur={()=>commitNumber('defaultPremiumBox')}
               className="w-full px-2 py-1.5 text-sm border border-slate-300 rounded-lg" />
           </div>
           <div>
