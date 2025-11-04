@@ -14,7 +14,7 @@ function ResultsTableImpl({ results, showCommission = false, showBank = false, s
     <div className="overflow-x-auto -mx-2 sm:mx-0">
       <table className="w-full min-w-[720px] sm:min-w-0 table-fixed">
         <thead>
-            <tr className="border-b-2 border-slate-200/80 bg-gradient-to-r from-slate-50 via-zinc-50/40 to-gray-50/40">
+            <tr className="border-b-2 border-slate-200/80 bg-gradient-to-r from-slate-50 via-blue-50/30 to-indigo-50/20">
             <th className="px-2 py-2 text-left text-[11px] sm:text-xs font-bold text-slate-700 uppercase tracking-wider">
               Senaryo
             </th>
@@ -89,9 +89,9 @@ function ResultsTableImpl({ results, showCommission = false, showBank = false, s
               : `${formatNumber(result.commissionAmount)} TL`
 
             return (
-              <tr key={`${result.platform}-${index}`} className="hover:bg-zinc-50/50 transition-all duration-200 border-b border-slate-100/80 group">
+              <tr key={`${result.platform}-${index}`} className="hover:bg-gradient-to-r hover:from-slate-50/80 hover:to-blue-50/30 transition-all duration-200 border-b border-slate-100/80 group">
                 <td className="px-2 py-2 whitespace-nowrap">
-                  <span className="text-xs sm:text-sm font-semibold text-slate-900 group-hover:text-zinc-600 transition-colors">
+                  <span className="text-xs sm:text-sm font-semibold text-slate-900 group-hover:text-slate-700 transition-colors">
                     {result.platform}
                   </span>
                 </td>
@@ -140,7 +140,7 @@ function ResultsTableImpl({ results, showCommission = false, showBank = false, s
                 </td>
                 {showBank && (
                   <td className="px-2 py-2 whitespace-nowrap text-center">
-                    <span className="text-xs sm:text-sm font-semibold text-zinc-700">
+                    <span className="text-xs sm:text-sm font-semibold text-slate-700">
                       {formatNumber(result.bankayaYatan)} TL
                     </span>
                   </td>

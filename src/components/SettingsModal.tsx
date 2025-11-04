@@ -176,7 +176,7 @@ export default function SettingsModal({ open, initial, onClose, onSave }: Settin
           </label>
           <div className="flex items-center gap-2">
             <button onClick={onClose} className="px-3 py-1.5 text-sm rounded-lg border border-slate-300">İptal</button>
-            <button onClick={()=>onSave(form, applyNow)} className="px-3 py-1.5 text-sm rounded-lg bg-zinc-500 text-white">Kaydet</button>
+            <button onClick={()=>onSave(form, applyNow)} className="px-3 py-1.5 text-sm rounded-lg bg-gradient-to-r from-slate-500 to-slate-600 text-white shadow-md hover:shadow-lg hover:from-slate-600 hover:to-slate-700 transition-all duration-200">Kaydet</button>
           </div>
         </div>
       </div>
