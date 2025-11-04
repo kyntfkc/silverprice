@@ -380,12 +380,12 @@ function ProfitCalculator() {
                 <button
                   onClick={() => setShowExtraCols(v=>!v)}
                   className="px-3 py-1.5 text-xs rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50"
-                  title="Komisyon ve Bankaya Yatan sütunlarını göster/gizle"
+                  title="Komisyon, Bankaya Yatan ve Alış Tutarı sütunlarını göster/gizle"
                 >{showExtraCols ? 'Detayı Gizle' : 'Detayı Göster'}</button>
               </div>
             </div>
             
-          <ResultsTable results={results} showCommission={showExtraCols} showBank={showExtraCols} />
+          <ResultsTable results={results} showCommission={showExtraCols} showBank={showExtraCols} showPurchasePrice={showExtraCols} />
         </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-slate-400">

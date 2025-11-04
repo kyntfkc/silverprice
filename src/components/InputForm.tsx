@@ -259,6 +259,14 @@ function InputForm({
             >
               60 cm Zincir
             </button>
+            <button
+              type="button"
+              disabled
+              className={`px-2.5 py-1.5 text-xs rounded-lg border transition-colors bg-rose-500 text-white border-rose-500 cursor-default`}
+              title={`45 cm Gümüş Zincir: ${Math.round(silverInfo.dollarRate * 2 * 100) / 100} TL`}
+            >
+              45 cm Gümüş Zincir
+            </button>
             </div>
 
             <div className="flex items-center gap-2 bg-slate-50/80 px-2.5 py-1.5 rounded-lg border border-slate-200">
@@ -282,18 +290,6 @@ function InputForm({
                 />
                 <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500"></div>
               </label>
-            </div>
-            <div className="flex items-center gap-2 bg-slate-50/80 px-2.5 py-1.5 rounded-lg border border-slate-200">
-              <span className="text-xs font-medium text-slate-700">45 cm Gümüş Zincir</span>
-              <input
-                type="number"
-                step="0.01"
-                value={Math.round(silverInfo.dollarRate * 2 * 100) / 100}
-                readOnly
-                disabled
-                className="w-20 px-2 py-1 text-xs border border-slate-300/70 rounded-md bg-slate-100 text-slate-600 cursor-not-allowed shadow-sm"
-              />
-              <span className="text-[11px] text-gray-500">TL</span>
             </div>
           </div>
         </div>
@@ -342,20 +338,6 @@ function InputForm({
             </div>
 
             <div className="grid grid-cols-4 gap-2 items-end">
-              <div>
-                <label className="block text-xs text-slate-600 mb-1 font-medium">45 cm Gümüş Zincir</label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={Math.round(silverInfo.dollarRate * 2 * 100) / 100}
-                    readOnly
-                    disabled
-                    className="h-9 w-full px-2 pr-8 text-sm border border-slate-300/70 rounded-lg bg-slate-100 text-slate-600 cursor-not-allowed text-center shadow-sm"
-                  />
-                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-500 font-medium">TL</span>
-                </div>
-              </div>
               <div>
                 <label className="block text-xs text-slate-600 mb-1 font-medium">Kargo</label>
                 <div className="relative">

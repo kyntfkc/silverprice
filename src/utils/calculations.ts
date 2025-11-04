@@ -84,7 +84,8 @@ export function calculateProfit(
     netProfit,
     profitRate,
     bankayaYatan,
-    optimumScore
+    optimumScore,
+    purchasePrice
   }
 }
 

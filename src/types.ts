@@ -38,6 +38,7 @@ export interface ProfitResult {
   profitRate: number
   bankayaYatan: number
   optimumScore?: number
+  purchasePrice?: number // Alış Tutarı
 }
 
 export interface SavedCalculation {
