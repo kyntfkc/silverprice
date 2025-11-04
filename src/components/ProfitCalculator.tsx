@@ -217,7 +217,7 @@ function ProfitCalculator() {
   // Standart senaryonun fiyatını otomatik hesapla
   const prevDepsRef = useRef<string>('')
   useEffect(() => {
-    const depsKey = `${productInfo.productGram}-${productInfo.laborDollar}-${silverInfo.dollarRate}-${expenses.shipping}-${expenses.packaging}-${expenses.serviceFee}-${expenses.extraChain}-${expenses.specialPackaging}-${expenses.eCommerceTaxRate}-${expenses.silverChain45Cost}`
+    const depsKey = `${productInfo.productGram}-${productInfo.laborDollar}-${silverInfo.dollarRate}-${expenses.shipping}-${expenses.packaging}-${expenses.serviceFee}-${expenses.extraChain}-${expenses.specialPackaging}-${expenses.premiumBox}-${expenses.eCommerceTaxRate}-${expenses.silverChain45Cost}`
     
     if (prevDepsRef.current === depsKey) return
     prevDepsRef.current = depsKey
