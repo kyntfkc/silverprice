@@ -41,7 +41,7 @@ export default function SettingsModal({ open, initial, onClose, onSave }: Settin
     defaultPremiumBox: String(initial.defaultPremiumBox ?? 300),
     defaultChain45Price: String(initial.defaultChain45Price ?? 10),
     defaultChain60Price: String(initial.defaultChain60Price ?? 30),
-    lightBoxMultiplier: String(initial.lightBoxMultiplier ?? 2),
+    lightBoxMultiplier: String(initial.lightBoxMultiplier ?? 1),
   })
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export default function SettingsModal({ open, initial, onClose, onSave }: Settin
       defaultExtraCost: String(initial.defaultExtraCost),
       defaultChain45Price: String(initial.defaultChain45Price ?? 10),
       defaultChain60Price: String(initial.defaultChain60Price ?? 30),
-      lightBoxMultiplier: String(initial.lightBoxMultiplier ?? 2),
+      lightBoxMultiplier: String(initial.lightBoxMultiplier ?? 1),
     })
   }, [initial])
 

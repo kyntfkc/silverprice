@@ -52,7 +52,7 @@ function ProfitCalculator() {
     defaultPremiumBox: 300,
     defaultChain45Price: 10,
     defaultChain60Price: 30,
-    lightBoxMultiplier: 2, // Işıklı Kutu varsayılan çarpanı
+    lightBoxMultiplier: 1, // Işıklı Kutu varsayılan çarpanı
   }
 
   const [showSettings, setShowSettings] = useState(false)
@@ -217,7 +217,7 @@ function ProfitCalculator() {
   // Standart senaryonun fiyatını otomatik hesapla
   const prevDepsRef = useRef<string>('')
   useEffect(() => {
-    const depsKey = `${productInfo.productGram}-${productInfo.laborDollar}-${silverInfo.dollarRate}-${expenses.shipping}-${expenses.packaging}-${expenses.serviceFee}-${expenses.extraChain}-${expenses.specialPackaging}-${expenses.premiumBox}-${expenses.eCommerceTaxRate}-${expenses.silverChain45Cost}`
+    const depsKey = `${productInfo.productGram}-${productInfo.laborDollar}-${silverInfo.dollarRate}-${expenses.shipping}-${expenses.packaging}-${expenses.serviceFee}-${expenses.extraChain}-${expenses.specialPackaging}-${expenses.premiumBox}-${expenses.eCommerceTaxRate}-${expenses.silverChain45Cost}-${appSettings.lightBoxMultiplier}`
     
     if (prevDepsRef.current === depsKey) return
     prevDepsRef.current = depsKey
@@ -248,7 +248,7 @@ function ProfitCalculator() {
       })
       return updated ?? prevPlatforms
     })
-  }, [productInfo, silverInfo, expenses])
+  }, [productInfo, silverInfo, expenses, appSettings.lightBoxMultiplier])
   
   // Kar oranı değiştiğinde otomatik fiyat güncelleme
   const prevProfitRatesRef = useRef<string>('')
@@ -287,7 +287,7 @@ function ProfitCalculator() {
       })
       return updated ?? prevPlatforms
     })
-  }, [platforms, productInfo, silverInfo, expenses])
+  }, [platforms, productInfo, silverInfo, expenses, appSettings.lightBoxMultiplier])
 
   useEffect(() => {
     if (!hasCalculated) return
@@ -304,17 +304,17 @@ function ProfitCalculator() {
       setIsCalculating(false)
     }, 300)
     return () => clearTimeout(timer)
-  }, [hasCalculated, productInfo, silverInfo, expenses, platforms])
+  }, [hasCalculated, productInfo, silverInfo, expenses, platforms, appSettings.lightBoxMultiplier])
 
   const handleCalculate = useCallback(() => {
     setIsCalculating(true)
     setTimeout(() => {
-      const calculatedResults = calculateAllPlatforms(productInfo, silverInfo, expenses, platforms)
+      const calculatedResults = calculateAllPlatforms(productInfo, silverInfo, expenses, platforms, appSettings.lightBoxMultiplier)
       setResults(calculatedResults)
       setIsCalculating(false)
       setHasCalculated(true)
     }, 100)
-  }, [productInfo, silverInfo, expenses, platforms])
+  }, [productInfo, silverInfo, expenses, platforms, appSettings.lightBoxMultiplier])
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {

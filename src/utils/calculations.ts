@@ -21,7 +21,7 @@ export function calculateProfit(
   silverInfo: SilverInfo,
   expenses: Expenses,
   platform: Platform,
-  lightBoxMultiplier: number = 2
+  lightBoxMultiplier: number = 1
 ): ProfitResult {
   // Ürün Tutarı hesapla: Ürün Gramı × İşçilik × Dolar Kuru
   const productAmount = calculateProductAmount(
@@ -97,7 +97,7 @@ export function calculateAllPlatforms(
   silverInfo: SilverInfo,
   expenses: Expenses,
   platforms: Platform[],
-  lightBoxMultiplier: number = 2
+  lightBoxMultiplier: number = 1
 ): ProfitResult[] {
   const sortedPlatforms = [...platforms].sort((a, b) => {
     if (a.name === 'Standart') return -1
@@ -130,7 +130,7 @@ export function calculateStandardSalePrice(
   expenses: Expenses,
   commissionRate: number = 22,
   targetProfitRate: number = 30,
-  lightBoxMultiplier: number = 2
+  lightBoxMultiplier: number = 1
 ): number {
   const productAmount = calculateProductAmount(
     productInfo.productGram,
